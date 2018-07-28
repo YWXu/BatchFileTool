@@ -3,6 +3,7 @@ package main;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.List;
@@ -36,6 +37,7 @@ public class BatchFiles extends JFrame implements ActionListener {
 	JButton button1;
 	JButton button2;
 	JTextField textField1;
+	JTextField textField2;
 
 	/**
 	 * Launch the application.
@@ -96,7 +98,7 @@ public class BatchFiles extends JFrame implements ActionListener {
 		comboBox.setSelectedIndex(0);
 		panel2.add(comboBox);
 
-		JTextField textField2 = new JTextField(15);
+		textField2 = new JTextField(15);
 		panel2.add(textField2);
 
 		button2 = new JButton("执行");
@@ -106,12 +108,64 @@ public class BatchFiles extends JFrame implements ActionListener {
 		JTextArea textArea = new JTextArea();
 //		textArea.setFocusable(false);
 		textArea.setLineWrap(true);
-		JScrollPane JSP=new JScrollPane(textArea);
+		JScrollPane JSP = new JScrollPane(textArea);
 		JSP.setBounds(0, 100, 450, 100);
-		JSP.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED); 
+		JSP.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		container.add(JSP);
 
 		setVisible(true);
+	}
+
+	/*
+	 * 文件重命名
+	 */
+	public static boolean renameFile(String file, String toFile) {
+
+		File toBeRenamed = new File(file);
+		// 检查要重命名的文件是否存在，是否是文件
+		if (!toBeRenamed.exists() || toBeRenamed.isDirectory()) {
+
+			System.out.println("文件不存在: " + file);
+			return false;
+		}
+
+		File newFile = new File(toFile);
+
+		// 修改文件名
+		if (toBeRenamed.renameTo(newFile)) {
+			System.out.println("重命名成功.");
+			return true;
+		} else {
+			System.out.println("重命名失败");
+			return false;
+		}
+
+	}
+
+	/*
+	 * 文件夹下文件所有文件展示
+	 */
+	public static void getFileName(String dirPath, String text, int operationType) {
+		String path = dirPath; // 路径
+		File f = new File(path);
+
+		File fa[] = f.listFiles();
+		for (int i = 0; i < fa.length; i++) {
+			File fs = fa[i];
+			if (fs.isDirectory()) {
+				System.out.println(fs.getName() + " [目录]");
+			} else {
+				String nameString = fs.getName();
+				System.out.println(fs.getName() + " [文件]");
+
+				StringBuilder sb = new StringBuilder(nameString);
+				sb.insert(0, text);
+				nameString = sb.toString();
+				if (renameFile(path + fs.getName(), path + nameString)) {
+					System.out.println(fs.getName() + "  重命名为 ： " + nameString);
+				}
+			}
+		}
 	}
 
 	@Override
@@ -134,7 +188,8 @@ public class BatchFiles extends JFrame implements ActionListener {
 				textField1.setText(file.getAbsolutePath());
 			}
 		} else if (e.getSource() == button2) {
-			new ShowDialog(BatchFiles.this, "无文件").setVisible(true);
+//			new ShowDialog(BatchFiles.this, "无文件").setVisible(true);
+			getFileName(textField1.getText() + "/", textField2.getText(), 0);
 		}
 	}
 
